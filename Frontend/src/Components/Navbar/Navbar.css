@@ -1,0 +1,31 @@
+.custom-navbar {
+  background: linear-gradient(90deg, #0f172a, #1e293b);
+  padding: 12px 0;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+}
+
+.nav-link {
+  color: #cbd5f5 !important;
+  margin-right: 15px;
+  transition: 0.3s;
+}
+
+.nav-link:hover {
+  color: #ffffff !important;
+}
+
+.btn-primary {
+  background-color: #6366f1;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #4f46e5;
+}
