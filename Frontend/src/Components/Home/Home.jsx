@@ -1,12 +1,11 @@
 import React from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "./Home.css";
 
 const Home = () => {
   return (
     <div className="home-container">
 
-      {/* 🔷 Hero Section */}
+      {/*  Hero Section */}
       <section className="hero-section d-flex align-items-center">
         <div className="container text-center">
           <h1 className="hero-title">
@@ -29,7 +28,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 🔷 Features Section */}
+      {/*  Features Section */}
       <section id="features" className="features-section">
         <div className="container text-center">
           <h2 className="section-title">Powerful Features</h2>
@@ -67,7 +66,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 🔷 About Section */}
+      {/*  About Section */}
       <section id="about" className="about-section">
         <div className="container text-center">
           <h2 className="section-title">About the Project</h2>
@@ -80,7 +79,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 🔷 CTA Section */}
+      {/*  CTA Section */}
       <section id="try" className="cta-section text-center">
         <div className="container">
           <h2>Start Analyzing Your Code Today 🚀</h2>

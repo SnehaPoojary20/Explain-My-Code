@@ -1,14 +1,16 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import "./Navbar.css";
 
 const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark custom-navbar">
       <div className="container">
+
         {/* Brand */}
-        <a className="navbar-brand fw-bold" href="/">
+        <Link className="navbar-brand fw-bold" to="/">
           Explain My Code
-        </a>
+        </Link>
 
         {/* Toggle Button */}
         <button
@@ -20,41 +22,38 @@ const Navbar = () => {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Nav Links */}
+        {/* Nav Items */}
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
+
             <li className="nav-item">
-              <a className="nav-link active" href="#home">
+              <Link className="nav-link" to="/">
                 Home
-              </a>
+              </Link>
             </li>
 
             <li className="nav-item">
-              <a className="nav-link" href="#features">
+              <Link className="nav-link" to="/features">
                 Features
-              </a>
+              </Link>
             </li>
 
             <li className="nav-item">
-              <a className="nav-link" href="#about">
+              <Link className="nav-link" to="/about">
                 About
-              </a>
-            </li>
-
-            <li className="nav-item">
-              <a className="nav-link" href="#contact">
-                Contact
-              </a>
+              </Link>
             </li>
 
             {/* CTA Button */}
             <li className="nav-item">
-              <a className="btn btn-primary ms-3" href="#try">
+              <Link className="btn btn-primary ms-3" to="/try">
                 Try Now
-              </a>
+              </Link>
             </li>
+
           </ul>
         </div>
+
       </div>
     </nav>
   );

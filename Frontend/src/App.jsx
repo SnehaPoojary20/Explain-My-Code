@@ -1,16 +1,21 @@
-import './App.css'
-import Navbar from './Components/Navbar/Navbar';
-import Home from './Components/Home/Home';
-import Footer from './Components/Footer/Footer';
-function App() {
- 
+import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./Components/Navbar/Navbar";
+import Home from "./Components/Home/Home";
+import Footer from "./Components/Footer/Footer";
 
+function App() {
   return (
-    <>
-    <Navbar/>
-    <Footer/>
-    </>
-  )
+    <Router>
+      <Navbar />
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+      </Routes>
+
+      <Footer />
+    </Router>
+  );
 }
 
-export default App
+export default App;
