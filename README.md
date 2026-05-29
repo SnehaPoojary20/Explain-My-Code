@@ -2,7 +2,7 @@
 
 A full-stack web application that analyzes Python code using Abstract Syntax Tree (AST) parsing and generates plain-English explanations using the OpenAI API.
 
-**Live Demo:** [Frontend URL] | **API Docs:** [Backend URL]/docs
+**Live Demo:** [https://explain-my-code-two.vercel.app/] | **API Docs:** [Backend URL]/docs
 
 ---
 
