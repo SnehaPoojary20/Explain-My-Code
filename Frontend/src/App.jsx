@@ -12,7 +12,7 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/try" to={<Explanation />} />
+        <Route path="/try" element={<Explanation />} />
       </Routes>
 
       <Footer />
