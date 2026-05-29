@@ -1,208 +1,205 @@
-#  Explain My Code
+# Explain My Code
 
-Explain My Code is a full-stack web application that analyzes Python source code, extracts structural information using Abstract Syntax Tree (AST) parsing, and generates clear, human-readable explanations using the OpenAI API.
+A full-stack web application that analyzes Python code using Abstract Syntax Tree (AST) parsing and generates plain-English explanations using the OpenAI API.
 
-The project is built with a **React frontend** and a **FastAPI backend**, following a clean, modular architecture suitable for scalable development.
-
----
-
-##  What It Does
-
-- Accepts Python code input from the user
-- Parses the code using Python AST
-- Extracts function-level structure
-- Sends code to OpenAI for contextual explanation
-- Returns structured JSON response
-- Displays explanation in a clean React UI
+**Live Demo:** [Frontend URL] | **API Docs:** [Backend URL]/docs
 
 ---
 
-##  Architecture Overview
+## What It Does
+
+Paste any Python code → get back:
+- Every function found (name, arguments, line number, docstring)
+- An AI-generated plain-English explanation of what the code does
+- Total line count and function count
+
+---
+
+## How It Works
 
 ```
+User pastes Python code in React frontend
+        ↓
+POST /analyze — FastAPI backend receives the code
+        ↓
+ast_service.py — Python's built-in AST module parses the code
+                 into a syntax tree and extracts all function definitions
+        ↓
+llm_service.py — Structured function data + raw code sent to OpenAI GPT-3.5
+                 with a prompt engineered for precise code explanation
+        ↓
+JSON response returned to frontend with functions + explanation
+```
 
-React Frontend
-↓
-FastAPI Backend
-↓
-AST Parser (Structure Extraction)
-↓
-OpenAI API (Natural Language Explanation)
-↓
-JSON Response → Frontend Display
+### Why AST first, then LLM?
 
+Sending structured AST output (function names, arguments, line numbers) alongside raw code gives the LLM better context than raw code alone. This produces more accurate, function-level explanations rather than generic summaries.
 
 ---
 
-##  Tech Stack
+## Tech Stack
 
-### Frontend
-- React
-- Axios (API calls)
-- CSS / Tailwind (optional styling)
+**Frontend**
+- React.js
+- React Router
+- Bootstrap 5
+- Axios
 
-### Backend
+**Backend**
 - Python
-- FastAPI
-- AST (Abstract Syntax Tree)
-- OpenAI API
-- Uvicorn
-- Pydantic
-- Docker (optional)
----
+- FastAPI (async REST API)
+- Python `ast` module (built-in, no install needed)
+- OpenAI API (GPT-3.5-turbo)
+- Pydantic v2 (request/response validation)
+- httpx (async HTTP client)
 
-## ⚙️ Backend Setup
-
-### 1️ Navigate to backend
-
-```bash
-cd backend
-````
-
-### 2️ Create virtual environment
-
-```bash
-python -m venv venv
-venv\Scripts\activate     # Windows
-# source venv/bin/activate  # Mac/Linux
-```
-
-### 3️ Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4️ Configure environment variables
-
-Create a `.env` file inside `/backend`:
-
-```
-OPENAI_API_KEY=your_api_key_here
-```
+**Deployment**
+- Frontend: Vercel
+- Backend: Railway
 
 ---
 
-###  Run Backend
-
-```bash
-uvicorn app.main:app --reload
-```
-
-Backend runs at:
+## Project Structure
 
 ```
-http://127.0.0.1:8000
-```
-
-Swagger documentation:
-
-```
-http://127.0.0.1:8000/docs
-```
-
-##  Frontend Setup
-
-### 1️ Navigate to frontend
-
-```bash
-cd frontend
-```
-
-### 2️ Install dependencies
-
-```bash
-npm install
-```
-
-### 3️ Start development server
-
-```bash
-npm run dev
-```
-
-Frontend runs at:
-
-```
-http://localhost:5173   (if using Vite)
+explain-my-code/
+├── Backend/
+│   ├── app/
+│   │   ├── main.py              # FastAPI app, CORS, router registration
+│   │   ├── models/
+│   │   │   └── code_models.py   # Pydantic models: CodeInput, FunctionInfo, AnalysisResponse
+│   │   ├── routes/
+│   │   │   └── routes.py        # POST /analyze endpoint
+│   │   ├── services/
+│   │   │   ├── ast_service.py   # AST parsing — extracts functions from code
+│   │   │   └── llm_service.py   # OpenAI API call — generates explanation
+│   │   └── utils/
+│   │       └── helpers.py       # Line counter, empty check utilities
+│   ├── requirements.txt
+│   ├── .env.example
+│   └── .gitignore
+└── Frontend/
+    └── src/
+        ├── components/
+        │   ├── Navbar.jsx
+        │   └── Footer.jsx
+        └── pages/
+            └── Home.jsx
 ```
 
 ---
 
-##  API Endpoint
+## API Reference
 
 ### POST `/analyze`
 
-### Request Body
+Accepts Python code and returns AST analysis + AI explanation.
 
+**Request**
 ```json
 {
-  "code": "def add(a, b): return a + b"
+  "code": "def add(a, b):\n    return a + b"
 }
 ```
 
-### Response
-
+**Response**
 ```json
 {
   "functions_found": ["add"],
-  "summary": "This function takes two parameters and returns their sum."
+  "function_details": [
+    {
+      "name": "add",
+      "args": ["a", "b"],
+      "line_number": 1,
+      "docstring": null
+    }
+  ],
+  "explanation": "This code defines a simple addition function that takes two parameters and returns their sum.",
+  "total_lines": 2,
+  "total_functions": 1
 }
 ```
 
----
-
-##  How It Works Internally
-
-1. User submits code via React interface.
-2. Axios sends request to FastAPI backend.
-3. AST parses the code and extracts function definitions.
-4. Code is sent to OpenAI for explanation.
-5. Backend returns structured response.
-6. Frontend displays formatted explanation.
+### GET `/health`
+Returns `{"status": "ok"}` — used to verify the backend is running.
 
 ---
 
-##  Future Improvements
-
-* Function-level explanation instead of full-code summary
-* Call graph visualization using NetworkX
-* Code complexity metrics
-* Multi-language support
-* Authentication & rate limiting
-* Deployment with Docker
-* CI/CD pipeline
-
----
-
-##  Use Cases
-
-* Understanding unfamiliar repositories
-* Learning Python code structure
-* Educational tool for beginners
-* AI-powered code documentation assistant
-
----
-
-##  Deployment 
+## Local Setup
 
 ### Backend
 
-* Railway
+```bash
+cd Backend
+
+# Create virtual environment
+python -m venv venv
+venv\Scripts\activate      # Windows
+# source venv/bin/activate  # Mac/Linux
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env and add your OpenAI API key
+
+# Run the server
+uvicorn app.main:app --reload
+```
+
+Backend runs at `http://localhost:8000`  
+Swagger docs at `http://localhost:8000/docs`
 
 ### Frontend
 
-* Vercel
-  
+```bash
+cd Frontend
+npm install
+
+# Create .env file
+echo "VITE_API_URL=http://localhost:8000" > .env
+
+npm run dev
+```
+
+Frontend runs at `http://localhost:5173`
+
 ---
 
-##  Author
+## Deployment
 
-Built as a full-stack learning project to explore:
+### Backend → Railway
 
-* API development
-* Code parsing techniques
-* AI integration
-* React + FastAPI architecture
+1. Push Backend folder to GitHub
+2. Create account at railway.app
+3. New Project → Deploy from GitHub → select this repo
+4. Set root directory to `Backend`
+5. Add environment variable: `OPENAI_API_KEY=your_key`
+6. Railway auto-detects FastAPI and deploys
+
+### Frontend → Vercel
+
+1. Push Frontend folder to GitHub
+2. Import project at vercel.com
+3. Add environment variable: `VITE_API_URL=https://your-app.railway.app`
+4. Deploy
+
+---
+
+## What I Learned Building This
+
+- How Python's `ast` module converts source code into a traversable tree structure
+- How to use `ast.walk()` to visit every node and filter by type (`ast.FunctionDef`)
+- How to design prompts that give LLMs structured context for better output quality
+- How to structure a FastAPI backend with separation of concerns (routes / services / models / utils)
+- Async HTTP calls with `httpx` inside FastAPI async endpoints
+- Pydantic v2 for request validation and response serialization
+
+---
+
+## Author
+
+**Sneha Poojary** — [LinkedIn](https://linkedin.com/in/snehapoojary) | [GitHub](https://github.com/SnehaPoojary20)
 
 
