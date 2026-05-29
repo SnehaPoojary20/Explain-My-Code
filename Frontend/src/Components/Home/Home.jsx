@@ -13,7 +13,7 @@ const Home = () => {
           </h1>
 
           <p className="hero-subtitle">
-            Context-aware code analysis using AST & Tree-sitter.
+            Context-aware code analysis using AST & AI.
             Generate function-level summaries and call graphs in real-time.
           </p>
 
@@ -71,10 +71,9 @@ const Home = () => {
         <div className="container text-center">
           <h2 className="section-title">About the Project</h2>
           <p className="about-text">
-            This project is a context-aware code analysis engine built using
-            Python, FastAPI, AST, Tree-sitter, and NetworkX. It helps developers
-            quickly understand complex codebases by generating structured summaries
-            and function-level insights in real-time.
+                  Built using Python, FastAPI, AST parsing, and OpenAI.
+                   Helps developers understand code faster by generating
+                    structured, function-level explanations in real-time.
           </p>
         </div>
       </section>
