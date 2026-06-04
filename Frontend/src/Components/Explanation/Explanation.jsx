@@ -135,7 +135,7 @@ def greet(name):
             </div>
 
             <div className="editor-footer">
-              <span className="char-count">{charCount} characters · {code.split("\n").length} lines</span>
+              <span className="char-count">{charCount} characters · {code ? code.split("\n").length : 0} lines</span>
               <button
                 className={`analyze-btn ${loading ? "analyzing" : ""}`}
                 onClick={handleAnalyze}

@@ -3,35 +3,56 @@ from typing import List
 from fastapi import HTTPException
 from app.models.code_models import FunctionInfo
 
+
 def extract_functions(code: str) -> List[FunctionInfo]:
-  
+
     try:
-        # ast.parse() converts code string into a tree
-        # If the code has syntax errors, this raises SyntaxError
         tree = ast.parse(code)
     except SyntaxError as e:
         raise HTTPException(
             status_code=400,
             detail=f"Invalid Python syntax: {str(e)}"
         )
+    except ValueError as e:
+       
+        raise HTTPException(
+            status_code=400,
+            detail=f"Code contains invalid characters: {str(e)}"
+        )
 
     functions = []
 
-    # ast.walk() visits every node in the tree
     for node in ast.walk(tree):
+       
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
 
-        # Check if this node is a function definition
-        if isinstance(node, ast.FunctionDef):
+            # Extract all argument types:
+            all_args: List[str] = []
 
-            # Extract argument names from the function signature
-            args = [arg.arg for arg in node.args.args]
+            for arg in node.args.args:
+                all_args.append(arg.arg)
 
-            # ast.get_docstring() extracts the docstring if present
+            if node.args.vararg:
+                all_args.append(f"*{node.args.vararg.arg}")
+
+            for arg in node.args.kwonlyargs:
+                all_args.append(arg.arg)
+
+            if node.args.kwarg:
+                all_args.append(f"**{node.args.kwarg.arg}")
+
+            
+            display_args = [a for a in all_args if a not in ("self", "cls")]
+
             docstring = ast.get_docstring(node)
 
+            fn_name = node.name
+            if isinstance(node, ast.AsyncFunctionDef):
+                fn_name = f"async {node.name}"
+
             functions.append(FunctionInfo(
-                name=node.name,
-                args=args,
+                name=fn_name,
+                args=display_args,
                 line_number=node.lineno,
                 docstring=docstring
             ))
