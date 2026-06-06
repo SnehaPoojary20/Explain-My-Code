@@ -7,6 +7,7 @@ const Navbar = () => {
   const location = useLocation();
 
   // If already on home, just scroll. If on another page, go home first then scroll.
+  
   const handleScrollLink = (e, sectionId) => {
     e.preventDefault();
     if (location.pathname === "/") {
@@ -14,8 +15,8 @@ const Navbar = () => {
     } else {
       navigate("/");
       setTimeout(() => {
-        document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
+  document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+}, 100);
     }
   };
 

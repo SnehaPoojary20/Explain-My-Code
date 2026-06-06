@@ -27,7 +27,7 @@ const Explanation = () => {
   const [error, setError] = useState("");
   const [charCount, setCharCount] = useState(0);
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/$/, "");
 
   const handleCodeChange = (e) => {
     setCode(e.target.value);
