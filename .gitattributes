@@ -1,0 +1,9 @@
+# Exclude React frontend from language statistics
+Frontend/** linguist-vendored
+
+# Ignore build output
+Frontend/build/** linguist-generated
+Frontend/dist/** linguist-generated
+
+# Count Python files
+*.py linguist-language=Python
