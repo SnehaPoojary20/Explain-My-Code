@@ -13,7 +13,8 @@ app = FastAPI(
 
 origins = [
     "https://explain-my-code-two.vercel.app",
-    "https://explain-my-code-production.up.railway.app/",   
+    "https://explain-my-code-4j89rxzxo-sneha-poojarys-projects.vercel.app", 
+    "https://explain-my-code-production.up.railway.app",
     "http://localhost:5173",
     "http://localhost:3000",
 ]
