@@ -9,19 +9,9 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Allow frontend
-
-origins = [
-    "https://explain-my-code-two.vercel.app",
-    "https://explain-my-code-4j89rxzxo-sneha-poojarys-projects.vercel.app", 
-    "https://explain-my-code-production.up.railway.app",
-    "http://localhost:5173",
-    "http://localhost:3000",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origin_regex=r"https://explain-my-code.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
