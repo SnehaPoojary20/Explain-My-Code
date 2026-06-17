@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Explanation.css";
 
 const SAMPLE_CODE = `def calculate_factorial(n):
@@ -20,14 +20,34 @@ def find_max(numbers):
             max_val = num
     return max_val`;
 
+const LOADING_STEPS = [
+  "Parsing code with AST...",
+  "Extracting function structure...",
+  "Generating AI explanation...",
+];
+
 const Explanation = () => {
   const [code, setCode] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [charCount, setCharCount] = useState(0);
+  const [loadingStep, setLoadingStep] = useState(0);
 
-const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/$/, "");
+  const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/$/, "");
+
+  useEffect(() => {
+    if (!loading) {
+      setLoadingStep(0);
+      return;
+    }
+    const timers = [
+      setTimeout(() => setLoadingStep(1), 0),
+      setTimeout(() => setLoadingStep(2), 1200),
+      setTimeout(() => setLoadingStep(3), 2600),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, [loading]);
 
   const handleCodeChange = (e) => {
     setCode(e.target.value);
@@ -83,7 +103,7 @@ const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replac
   return (
     <div className="try-page">
 
-      {/* Page Header */}
+     
       <div className="try-header">
         <div className="try-header-inner">
           <span className="try-tag">AST + AI Analysis</span>
@@ -97,8 +117,7 @@ const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replac
 
       <div className="try-body container">
         <div className="try-grid">
-
-          {/* LEFT — Input Panel */}
+          
           <div className="panel input-panel">
             <div className="panel-header">
               <div className="panel-title">
@@ -125,17 +144,15 @@ const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replac
                 className="code-editor"
                 value={code}
                 onChange={handleCodeChange}
-                placeholder="# Paste your Python code here...
-# Example:
-def greet(name):
-    return f'Hello, {name}!'
-"
+                placeholder={`# Paste your Python code here...\n# Example:\ndef greet(name):\n    return f'Hello, {name}!'`}
                 spellCheck={false}
               />
             </div>
 
             <div className="editor-footer">
-              <span className="char-count">{charCount} characters · {code ? code.split("\n").length : 0} lines</span>
+              <span className="char-count">
+                {charCount} characters · {code ? code.split("\n").length : 0} lines
+              </span>
               <button
                 className={`analyze-btn ${loading ? "analyzing" : ""}`}
                 onClick={handleAnalyze}
@@ -163,7 +180,7 @@ def greet(name):
             )}
           </div>
 
-          {/* RIGHT — Output Panel */}
+          
           <div className="panel output-panel">
             <div className="panel-header">
               <div className="panel-title">
@@ -186,25 +203,24 @@ def greet(name):
                   </svg>
                 </div>
                 <p className="empty-title">Ready to analyze</p>
-                <p className="empty-sub">Paste your Python code and click Analyze Code to get started. Or load the sample to see how it works.</p>
+                <p className="empty-sub">
+                  Paste your Python code and click Analyze Code to get started. Or load the sample to see how it works.
+                </p>
               </div>
             )}
 
             {loading && (
               <div className="loading-state">
                 <div className="loading-steps">
-                  <div className="loading-step active">
-                    <span className="step-dot"></span>
-                    Parsing code with AST...
-                  </div>
-                  <div className="loading-step">
-                    <span className="step-dot"></span>
-                    Extracting function structure...
-                  </div>
-                  <div className="loading-step">
-                    <span className="step-dot"></span>
-                    Generating AI explanation...
-                  </div>
+                  {LOADING_STEPS.map((label, i) => (
+                    <div
+                      className={`loading-step ${loadingStep > i ? "active" : ""}`}
+                      key={i}
+                    >
+                      <span className="step-dot"></span>
+                      {label}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -212,7 +228,6 @@ def greet(name):
             {result && (
               <div className="result-content">
 
-                {/* Stats Row */}
                 <div className="stats-row">
                   <div className="stat-card">
                     <div className="stat-num">{result.functions_found.length}</div>
@@ -229,8 +244,7 @@ def greet(name):
                     <div className="stat-label">Parameters</div>
                   </div>
                 </div>
-
-                {/* AI Explanation */}
+               
                 <div className="result-section">
                   <div className="section-label">
                     <span className="label-icon">✦</span>
@@ -241,8 +255,7 @@ def greet(name):
                   </div>
                 </div>
 
-                {/* Functions Found */}
-                {result.function_details.length > 0 && (
+               {result.function_details.length > 0 && (
                   <div className="result-section">
                     <div className="section-label">
                       <span className="label-icon">⬡</span>

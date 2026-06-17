@@ -6,10 +6,9 @@ from app.models.code_models import FunctionInfo
 
 logger = logging.getLogger(__name__)
 
-# Model to use — easy to upgrade in one place
 OPENAI_MODEL = "gpt-3.5-turbo"
 OPENAI_TIMEOUT = 30  # seconds
-MAX_CODE_LENGTH_FOR_PROMPT = 8000  # prevent token overflow in the prompt
+MAX_CODE_LENGTH_FOR_PROMPT = 8000  
 
 
 async def get_explanation(code: str, functions: List[FunctionInfo]) -> str:
@@ -39,8 +38,8 @@ async def get_explanation(code: str, functions: List[FunctionInfo]) -> str:
     if len(code) > MAX_CODE_LENGTH_FOR_PROMPT:
         code_for_prompt = code[:MAX_CODE_LENGTH_FOR_PROMPT] + "\n\n... [truncated for length]"
 
-    # SECURITY : system prompt carries instructions, user message carries data
-      system_prompt = """You are a helpful code explanation assistant.
+   # SECURITY: system prompt carries instructions, user message carries data
+        system_prompt = """You are a helpful code explanation assistant.
 When given Python code and a list of its functions (extracted via AST parsing), you explain:
 1. What the overall code does (2-3 sentences)
 2. What each function does (one line each)
