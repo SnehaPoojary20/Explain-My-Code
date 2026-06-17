@@ -2,7 +2,7 @@
 
 An AI-powered Python code analysis tool. Paste any Python code — get back a structured breakdown of every function and a plain-English explanation of what the code actually does.
 
-**Live:** [explain-my-code-two.vercel.app](https://explain-my-code-two.vercel.app) · **API Docs:** `[backend-url]/docs`
+**Live:** [explain-my-code-two.vercel.app](https://explain-my-code-two.vercel.app) 
 
 ---
 
