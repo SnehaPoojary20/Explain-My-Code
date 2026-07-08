@@ -12,18 +12,7 @@ MAX_CODE_LENGTH_FOR_PROMPT = 8000
 
 
 async def get_explanation(code: str, functions: List[FunctionInfo]) -> str:
-    """
-    Call OpenAI to generate a plain-English explanation of the submitted code.
-
-    Fixes applied:
-    - System/user role separation prevents prompt injection
-    - response.status_code is checked BEFORE accessing data["choices"]
-      (httpx does NOT raise on 4xx/5xx — only on network errors)
-    - Handles 429 rate limit and 401 auth errors with clear messages
-    - Truncates code in prompt to avoid token overflow on large inputs
-    - Graceful fallback for any failure — never crashes the endpoint
-    """
-
+ 
     if functions:
         fn_lines = []
         for fn in functions:
