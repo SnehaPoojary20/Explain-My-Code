@@ -8,11 +8,11 @@ logger = logging.getLogger(__name__)
 
 OPENAI_MODEL = "gpt-3.5-turbo"
 OPENAI_TIMEOUT = 30  # seconds
-MAX_CODE_LENGTH_FOR_PROMPT = 8000  
+MAX_CODE_LENGTH_FOR_PROMPT = 8000
 
 
 async def get_explanation(code: str, functions: List[FunctionInfo]) -> str:
- 
+
     if functions:
         fn_lines = []
         for fn in functions:
@@ -22,13 +22,12 @@ async def get_explanation(code: str, functions: List[FunctionInfo]) -> str:
     else:
         functions_summary = "No named functions found — this appears to be a script or module-level code."
 
-    
     code_for_prompt = code
     if len(code) > MAX_CODE_LENGTH_FOR_PROMPT:
         code_for_prompt = code[:MAX_CODE_LENGTH_FOR_PROMPT] + "\n\n... [truncated for length]"
 
-   # SECURITY: system prompt carries instructions, user message carries data
-        system_prompt = """You are a helpful code explanation assistant.
+    # SECURITY: system prompt carries instructions, user message carries data
+    system_prompt = """You are a helpful code explanation assistant.
 When given Python code and a list of its functions (extracted via AST parsing), you explain:
 1. What the overall code does (2-3 sentences)
 2. What each function does (one line each)
@@ -69,7 +68,6 @@ Here is the full Python code to explain:
                 }
             )
 
-           
             if response.status_code == 429:
                 logger.warning("OpenAI rate limit hit")
                 return _fallback_explanation(functions, reason="OpenAI rate limit reached — try again in a moment")
