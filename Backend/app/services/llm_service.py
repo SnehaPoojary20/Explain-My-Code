@@ -6,7 +6,7 @@ from app.models.code_models import FunctionInfo
 
 logger = logging.getLogger(__name__)
 
-OPENAI_MODEL = "gpt-3.5-turbo"
+OPENAI_MODEL = "gemini-2.5-flash"
 OPENAI_TIMEOUT = 30  # seconds
 MAX_CODE_LENGTH_FOR_PROMPT = 8000
 
@@ -45,14 +45,14 @@ Here is the full Python code to explain:
 {code_for_prompt}
 ```"""
 
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        return _fallback_explanation(functions, reason="OPENAI_API_KEY not configured")
+        return _fallback_explanation(functions, reason="GEMINI_API_KEY not configured")
 
     try:
         async with httpx.AsyncClient(timeout=OPENAI_TIMEOUT) as client:
             response = await client.post(
-                "https://api.openai.com/v1/chat/completions",
+                "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
                 headers={
                     "Authorization": f"Bearer {api_key}",
                     "Content-Type": "application/json"
