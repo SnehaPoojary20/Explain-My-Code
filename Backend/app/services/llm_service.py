@@ -63,7 +63,7 @@ Here is the full Python code to explain:
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": user_message}
                     ],
-                    "max_tokens": 300,
+                    "max_tokens": 8000,
                     "temperature": 0.3
                 }
             )
