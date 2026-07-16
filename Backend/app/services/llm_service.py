@@ -6,7 +6,7 @@ from app.models.code_models import FunctionInfo
 
 logger = logging.getLogger(__name__)
 
-OPENAI_MODEL = "gemini-2.5-flash"
+OPENAI_MODEL = "gemini-3.5-flash"
 OPENAI_TIMEOUT = 30  # seconds
 MAX_CODE_LENGTH_FOR_PROMPT = 8000
 
