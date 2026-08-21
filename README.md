@@ -6,9 +6,9 @@ Live: https://explain-my-code-two.vercel.app/
 
 ### Why AST before LLM?
 
-Most "explain this code" tools just dump raw code into a prompt. This project does something different: it parses the code into an AST first, extracts structured function metadata (names, arguments, line numbers, docstrings), and sends both the structured data and the raw code to GPT-3.5-turbo.
+Most "explain this code" tools just dump raw code into a prompt. This project does something different: it parses the code into an AST first, extracts structured function metadata (names, arguments, line numbers, docstrings), and sends both the structured data and the raw code to an LLM.
 
-Giving the LLM pre-extracted structure is intended to produce more accurate, function-level explanations than a generic summary would. The AST analysis itself is deterministic — it will always correctly identify every function, regardless of what the LLM does with it.
+Giving the LLM pre-extracted structure is intended to produce more accurate, function-level explanations than a generic summary would. The AST analysis itself is deterministic — it will always correctly identify every function, regardless of what the LLM does with it. If the LLM call fails or the API key isn't configured, the endpoint still returns the AST results with a fallback message instead of erroring out — the core feature works even when the AI layer doesn't.
 
 ### How It Works
 
@@ -19,12 +19,15 @@ User pastes Python code (React frontend)
 POST /analyze  (FastAPI)
         │
         ├── ast_service.py
-        │     └── ast.parse() → ast.walk() → filter ast.FunctionDef nodes
-        │           → extract name, args, lineno, docstring
+        │     └── ast.parse() → walk module body → collect ast.FunctionDef /
+        │           ast.AsyncFunctionDef nodes (including class methods)
+        │           → extract name, args, line number, docstring
         │
         └── llm_service.py
-              └── structured AST data + raw code → OpenAI GPT-3.5-turbo
-                    → function-level natural language explanation
+              └── structured AST data + raw code → Google Gemini
+                    (via Gemini's OpenAI-compatible chat completions endpoint)
+                    → function-level natural language explanation,
+                      with a deterministic fallback if the call fails
         │
         ▼
 JSON response → React frontend renders results
@@ -53,7 +56,7 @@ POST /analyze
       "docstring": "Returns the sum of a and b."
     }
   ],
-  "explanation": "This code defines a simple addition function that accepts two numeric arguments and returns their sum. The docstring accurately describes its behavior.",
+  "explanation": "This code defines a simple addition function that accepts two numeric arguments and returns their sum.",
   "total_lines": 3,
   "total_functions": 1
 }
@@ -71,33 +74,33 @@ explain-my-code/
 │   └── app/
 │       ├── main.py              # FastAPI app, CORS, router
 │       ├── models/
-│       │   └── code_models.py   # Pydantic: CodeInput, FunctionInfo, AnalysisResponse
+│       │   └── code_models.py   # Pydantic v2: CodeInput, FunctionInfo, AnalysisResponse
 │       ├── routes/
 │       │   └── routes.py        # POST /analyze endpoint
 │       ├── services/
 │       │   ├── ast_service.py   # AST parsing — extracts function metadata
-│       │   └── llm_service.py   # OpenAI API call — generates explanation
+│       │   └── llm_service.py   # Gemini API call — generates explanation
 │       └── utils/
 │           └── helpers.py       # Line counter, empty check utilities
 └── Frontend/
     └── src/
-        ├── components/
-        │   ├── Navbar.jsx
-        │   └── Footer.jsx
-        └── pages/
-            └── Home.jsx         # Live code editor + results display
+        ├── Components/
+        │   ├── Navbar/
+        │   ├── Footer/
+        │   ├── Home/
+        │   └── Explanation/      # Code editor + results display
 ```
 
 ### Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | React.js, Bootstrap 5, Axios |
+| Frontend | React.js, plain CSS, native `fetch` |
 | Backend | Python, FastAPI |
-| Static analysis | Python `ast` module (stdlib — no install needed) |
-| LLM | OpenAI GPT-3.5-turbo via async httpx |
+| Static analysis | Python `ast` module (stdlib) |
+| LLM | Google Gemini, called directly via `httpx` against Gemini's OpenAI-compatible endpoint (no SDK) |
 | Validation | Pydantic v2 |
-| Deployment | Vercel (frontend), Railway (backend) |
+| Deployment | Vercel (frontend), Render (backend) |
 
 ### Local Setup
 
@@ -105,16 +108,14 @@ explain-my-code/
 git clone https://github.com/SnehaPoojary20/Explain-My-Code.git
 
 # Backend
-cd Backend
+cd Explain-My-Code/Backend
 python -m venv venv
 venv\Scripts\activate         # Windows
 # source venv/bin/activate    # Mac/Linux
 pip install -r requirements.txt
-cp .env.example .env
-# Add OPENAI_API_KEY to .env
+# create a .env with: GEMINI_API_KEY
 uvicorn app.main:app --reload
-# Runs at http://localhost:8000
-# Swagger docs at http://localhost:8000/docs
+# Runs at http://localhost:8000 — Swagger docs at /docs
 
 # Frontend
 cd ../Frontend
@@ -124,20 +125,19 @@ npm run dev
 # Runs at http://localhost:5173
 ```
 
-### What I learned building this
+### What I Learned Building This
 
-- How Python's `ast` module converts source code into a traversable node tree
-- How `ast.walk()` traverses every node depth-first, and how to filter by type (`ast.FunctionDef`, `ast.AsyncFunctionDef`)
+- How Python's `ast` module converts source code into a traversable node tree, and how to walk it selectively (top-level + class methods, but not nested closures) instead of blindly using `ast.walk()` on everything
 - How prompt structure affects LLM output quality — passing structured context alongside raw code appears to outperform raw code alone, though this hasn't been formally evaluated (see below)
-- FastAPI's async request handling with httpx for non-blocking OpenAI API calls
-- Pydantic v2 for request validation and typed response serialization
+- FastAPI's async request handling with `httpx` for non-blocking LLM API calls
+- Designing a graceful-degradation path so a third-party API outage doesn't take down the whole feature — the fallback response is not an error state, it's a genuinely useful reduced result
 
-### What I'd improve next
+### What I'd Improve Next
 
 - **Formally evaluate output quality** — compare AST-augmented explanations against raw-code-prompting explanations on a fixed test set, instead of relying on informal impression.
 - **Measure actual response latency** across a range of function sizes and concurrent load.
 - Support more languages — extend beyond Python using tree-sitter for multi-language AST parsing.
-- Streaming responses — stream GPT output token-by-token to the frontend instead of waiting for full completion.
+- Streaming responses — stream model output token-by-token to the frontend instead of waiting for full completion.
 - Caching — hash the input code and cache results to avoid redundant API calls for identical submissions.
 - Complexity scoring — surface cyclomatic complexity per function alongside the explanation.
 
