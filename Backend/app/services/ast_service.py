@@ -20,7 +20,7 @@ def extract_functions(code: str) -> List[FunctionInfo]:
             # Only include top-level and class-method functions, not closures
             pass  
 
-    # Correct approach: iterate module body directly for top-level,
+    # iterate module body directly for top-level,
     # then optionally one level deep for class methods
     def collect(nodes):
         for node in nodes:
